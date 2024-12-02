@@ -1,0 +1,253 @@
+/* General Reset */
+body, h1, h2, h3, p, form, input, select, button, textarea {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+/* Body Styling */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f9f9f9;
+    color: #333;
+    line-height: 1.6;
+    font-size: 16px;
+}
+
+/* Container */
+.container {
+    max-width: 900px;
+    margin: 30px auto;
+    padding: 20px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Headings */
+h1, h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #4CAF50;
+}
+
+* Navbar */
+.navbar {
+    background-color: #4CAF50;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+    font-size: 18px;
+}
+
+.navbar a {
+    color: white;
+    text-decoration: none;
+    margin: 0 10px;
+    transition: color 0.3s;
+}
+
+.navbar a:hover {
+    color: #C8E6C9;
+}
+
+
+/* Form Styling */
+form {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+label {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+input, select, textarea, button {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+textarea {
+    resize: none;
+}
+
+/* Buttons */
+button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+/* Input Focus */
+input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: #4CAF50;
+}
+
+/* Links */
+a {
+    color: #4CAF50;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: #388E3C;
+}
+/* Login/Signup Divider */
+.divider {
+    text-align: center;
+    margin: 20px 0;
+    color: #777;
+}
+
+
+/* Profile Page */
+.profile-pic {
+    display: block;
+    margin: 0 auto 20px;
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #4CAF50;
+}
+
+/* Form Groups */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group p {
+    font-size: 16px;
+}
+
+/* Divider for Login and Signup */
+.divider {
+    text-align: center;
+    margin: 20px 0;
+    color: #777;
+}
+
+/* Calculator Buttons */
+.calculator {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+}
+
+.calculator button {
+    background-color: #e0e0e0;
+    border: 1px solid #ccc;
+    color: #333;
+    font-size: 1.2em;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.calculator button:hover {
+    background-color: #4CAF50;
+    color: white;
+}
+
+/* Display Tables */
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.table th, .table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+}
+
+.table th {
+    background-color: #4CAF50;
+    color: white;
+}
+
+/* Budget Alert */
+.alert {
+    padding: 15px;
+    margin-top: 20px;
+    border-radius: 5px;
+    font-weight: bold;
+    color: white;
+}
+
+.alert.success {
+    background-color: #4CAF50;
+}
+
+.alert.warning {
+    background-color: #FF9800;
+}
+
+.alert.error {
+    background-color: #F44336;
+}
+
+/* Category Tags */
+.category {
+    display: inline-block;
+    padding: 5px 10px;
+    margin: 5px;
+    border-radius: 20px;
+    font-size: 14px;
+    color: white;
+    background-color: #4CAF50;
+}
+
+.category:hover {
+    background-color: #45a049;
+}
+
+/* Actions Section */
+.actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.actions .logout, .actions .delete {
+    padding: 10px 15px;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.actions .logout {
+    background-color: #2196F3;
+    color: white;
+}
+
+.actions .delete {
+    background-color: #F44336;
+    color: white;
+}
+
+.actions .logout:hover {
+    background-color: #1976D2;
+}
+
+.actions .delete:hover {
+    background-color: #D32F2F;
+}
