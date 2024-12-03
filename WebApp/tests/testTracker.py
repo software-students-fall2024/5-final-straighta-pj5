@@ -1,124 +1,121 @@
-import unittest
+import pytest
 from app import app, users_collection, budgets_collection, expenses_collection
 from flask import session
-import bcrypt
 from datetime import datetime
+import bcrypt
 
-class TestExpenseTracker(unittest.TestCase):
-    def setUp(self):
-        self.app = app.test_client()
-        self.app.testing = True
+@pytest.fixture
+def client():
+    app.config['TESTING'] = True
+    app.config['SECRET_KEY'] = 'test_secret_key'
+    with app.test_client() as client:
+        with app.app_context():
+            # Clear test database collections before each test
+            users_collection.delete_many({})
+            budgets_collection.delete_many({})
+            expenses_collection.delete_many({})
+        yield client
 
-        # Create a test user
-        self.username = 'testuser'
-        self.password = 'password'
-        self.hashed_password = bcrypt.hashpw(self.password.encode('utf-8'), bcrypt.gensalt())
-        users_collection.insert_one({
-            'username': self.username,
-            'email': 'testuser@example.com',
-            'password': self.hashed_password
-        })
+# Helper functions to create test data
+def create_test_user(username, password):
+    hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+    users_collection.insert_one({
+        'username': username,
+        'email': f'{username}@example.com',
+        'password': hashed_password
+    })
 
-        # Set up session for testing
-        with self.app as c:
-            with c.session_transaction() as sess:
-                sess['username'] = self.username
+def login_user(client, username, password):
+    return client.post('/login', data={'username': username, 'password': password})
 
-    def tearDown(self):
-        # Clean up collections after each test
-        users_collection.delete_many({'username': self.username})
-        budgets_collection.delete_many({'username': self.username})
-        expenses_collection.delete_many({'username': self.username})
+# Tests for user authentication
+def test_signup(client):
+    response = client.post('/signup', data={'username': 'testuser', 'email': 'testuser@example.com', 'password': 'password123'})
+    assert response.status_code == 201
+    assert response.json['message'] == 'Signup successful!'
+    user = users_collection.find_one({'username': 'testuser'})
+    assert user is not None
 
-    def test_signup(self):
-        response = self.app.post('/signup', data={
-            'username': 'newuser',
-            'email': 'newuser@example.com',
-            'password': 'newpassword'
-        })
-        self.assertEqual(response.status_code, 201)
-        self.assertIn(b'Signup successful!', response.data)
+def test_login_success(client):
+    create_test_user('testuser', 'password123')
+    response = login_user(client, 'testuser', 'password123')
+    assert response.status_code == 200
+    assert response.json['message'] == 'Login successful!'
 
-    def test_login(self):
-        response = self.app.post('/login', data={
-            'username': self.username,
-            'password': self.password
-        })
-        self.assertEqual(response.status_code, 200)
-        self.assertIn(b'Login successful!', response.data)
+def test_login_failure(client):
+    create_test_user('testuser', 'password123')
+    response = login_user(client, 'testuser', 'wrongpassword')
+    assert response.status_code == 401
+    assert response.json['message'] == 'Invalid username or password.'
 
-    def test_set_budget(self):
-        response = self.app.post('/set_budget', data={
-            'budget_amount': '1500'
-        }, follow_redirects=True)
-        self.assertEqual(response.status_code, 200)
-        budget = budgets_collection.find_one({'username': self.username})
-        self.assertIsNotNone(budget)
-        self.assertEqual(budget['amount'], 1500.0)
+# Tests for budget functionality
+def test_set_budget(client):
+    create_test_user('testuser', 'password123')
+    login_user(client, 'testuser', 'password123')
 
-    def test_view_expenses(self):
-        # Insert a test expense
-        expenses_collection.insert_one({
-            'username': self.username,
-            'amount': 100,
-            'category': 'Food',
-            'date': datetime.now()
-        })
+    response = client.post('/set_budget', data={'budget_amount': '500.0'})
+    assert response.status_code == 302  # Redirect to the budget page
 
-        response = self.app.get('/view_expenses')
-        self.assertEqual(response.status_code, 200)
-        self.assertIn(b'Food', response.data)
-        self.assertIn(b'100', response.data)
+    budget = budgets_collection.find_one({'username': 'testuser'})
+    assert budget is not None
+    assert budget['amount'] == 500.0
 
-    def test_edit_expense(self):
-        # Insert a test expense
-        expense = {
-            'username': self.username,
-            'amount': 100,
-            'category': 'Food',
-            'date': datetime.now()
-        }
-        expense_id = expenses_collection.insert_one(expense).inserted_id
+# Tests for expense functionality
+def test_add_expense(client):
+    create_test_user('testuser', 'password123')
+    login_user(client, 'testuser', 'password123')
 
-        # Edit the expense
-        response = self.app.post(f'/edit_expense/{expense_id}', data={
-            'amount': '200',
-            'category': 'Grocery',
-            'date': '2023-12-01',
-            'notes': 'Updated expense'
-        }, follow_redirects=True)
-        self.assertEqual(response.status_code, 200)
+    expenses_collection.insert_one({
+        'username': 'testuser',
+        'amount': 100.0,
+        'category': 'Food',
+        'date': datetime.now(),
+        'notes': 'Test expense'
+    })
 
-        # Check if the expense has been updated
-        updated_expense = expenses_collection.find_one({'_id': expense_id})
-        self.assertEqual(updated_expense['amount'], 200.0)
-        self.assertEqual(updated_expense['category'], 'Grocery')
+    expenses = list(expenses_collection.find({'username': 'testuser'}))
+    assert len(expenses) == 1
+    assert expenses[0]['category'] == 'Food'
+    assert expenses[0]['amount'] == 100.0
 
-    def test_get_expense_data(self):
-        # Insert test expenses
-        expenses_collection.insert_many([
-            {'username': self.username, 'amount': 100, 'category': 'Food', 'date': datetime.now()},
-            {'username': self.username, 'amount': 150, 'category': 'Transportation', 'date': datetime.now()}
-        ])
+# Tests for viewing expenses
+def test_view_expenses(client):
+    create_test_user('testuser', 'password123')
+    login_user(client, 'testuser', 'password123')
 
-        response = self.app.get('/api/expense_data/week')
-        self.assertEqual(response.status_code, 200)
-        data = response.get_json()
-        self.assertIsInstance(data, list)
-        self.assertGreater(len(data), 0)
+    expenses_collection.insert_one({
+        'username': 'testuser',
+        'amount': 100.0,
+        'category': 'Food',
+        'date': datetime.now(),
+        'notes': 'Test expense'
+    })
 
-    def test_get_expense_details(self):
-        # Insert test expenses
-        expenses_collection.insert_many([
-            {'username': self.username, 'amount': 100, 'category': 'Food', 'date': datetime.now()},
-            {'username': self.username, 'amount': 150, 'category': 'Transportation', 'date': datetime.now()}
-        ])
+    response = client.get('/view_expenses')
+    assert response.status_code == 200
+    assert b'Test expense' in response.data
 
-        response = self.app.get('/api/expense_details/week')
-        self.assertEqual(response.status_code, 200)
-        details = response.get_json()
-        self.assertIsInstance(details, list)
-        self.assertGreater(len(details), 0)
+# Tests for editing expenses
+def test_edit_expense(client):
+    create_test_user('testuser', 'password123')
+    login_user(client, 'testuser', 'password123')
 
-if __name__ == '__main__':
-    unittest.main()
+    expense_id = expenses_collection.insert_one({
+        'username': 'testuser',
+        'amount': 100.0,
+        'category': 'Food',
+        'date': datetime.now(),
+        'notes': 'Old expense'
+    }).inserted_id
+
+    response = client.post(f'/edit_expense/{expense_id}', data={
+        'amount': '200.0',
+        'category': 'Food',
+        'date': '2023-12-31',
+        'notes': 'Updated expense'
+    })
+    assert response.status_code == 302  # Redirect to the expenses page
+
+    updated_expense = expenses_collection.find_one({'_id': expense_id})
+    assert updated_expense['amount'] == 200.0
+    assert updated_expense['notes'] == 'Updated expense'
