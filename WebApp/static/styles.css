@@ -21,8 +21,14 @@ body {
     margin: 30px auto;
     padding: 20px;
     background: #fff;
-    border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.container:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
 }
 
 /* Headings */
@@ -30,6 +36,7 @@ h1, h2 {
     text-align: center;
     margin-bottom: 20px;
     color: #4CAF50;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 /* Navbar */
@@ -41,17 +48,21 @@ h1, h2 {
     align-items: center;
     color: white;
     font-size: 18px;
+    border-radius: 10px;
+    margin-bottom: 20px;
 }
 
 .navbar a {
     color: white;
     text-decoration: none;
     margin: 0 10px;
-    transition: color 0.3s;
+    font-weight: bold;
+    transition: color 0.3s ease, transform 0.2s ease;
 }
 
 .navbar a:hover {
     color: #C8E6C9;
+    transform: scale(1.1);
 }
 
 
@@ -73,7 +84,15 @@ input, select, textarea, button {
     border: 1px solid #ccc;
     border-radius: 5px;
     font-size: 16px;
+    outline: none;
+    transition: box-shadow 0.3s ease, border-color 0.3s ease;
 }
+
+input:focus, select:focus, textarea:focus {
+    border-color: #66BB6A;
+    box-shadow: 0 0 5px #66BB6A;
+}
+
 
 textarea {
     resize: none;
@@ -86,11 +105,13 @@ button {
     border: none;
     cursor: pointer;
     font-size: 18px;
+    border-radius: 5px;
     transition: background-color 0.3s ease;
 }
 
 button:hover {
     background-color: #45a049;
+    transform: scale(1.05);
 }
 
 /* Calculator Buttons */
@@ -114,7 +135,7 @@ button:hover {
 
 .calculator button:hover {
     background-color: #4CAF50;
-    color: white;
+    transform: scale(1.1);
 }
 
 /* Expense Table */
@@ -122,6 +143,9 @@ table {
     width: 100%;
     border-collapse: collapse;
     margin: 20px 0;
+    background: #f1f8e9;
+    border-radius: 10px;
+    overflow: hidden;
 }
 
 table th, table td {
@@ -133,6 +157,14 @@ table th, table td {
 table th {
     background-color: #4CAF50;
     color: white;
+}
+
+table td {
+    transition: background-color 0.3s ease;
+}
+
+table td:hover {
+    background-color: #c8e6c9;
 }
 
 /* Input Focus */
@@ -178,6 +210,7 @@ a:hover {
     border-radius: 5px;
     font-weight: bold;
     color: white;
+    text-align: center;
 }
 
 .alert.success {
@@ -215,18 +248,27 @@ a:hover {
     background-color: #F44336;
     color: white;
     text-decoration: none;
+    transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 .actions a.logout {
-    background-color: #2196F3;
+    background: #388E3C;
+}
+
+.actions a.delete {
+    background: #F44336;
 }
 
 .actions a:hover {
-    background-color: #D32F2F;
+    transform: scale(1.05);
 }
 
 .actions a.logout:hover {
-    background-color: #1976D2;
+    background: #66BB6A;
+}
+
+.actions a.delete:hover {
+    background: #D32F2F;
 }
 
 /* Category Tags */
