@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Expense History</title>
-        <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-    </head>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Display Expenses</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
 <body>
     <nav class="navbar">
         <a href="/view_expenses">Edit Expenses</a>
@@ -17,52 +17,38 @@
 
     <h1>Expense History</h1>
 
-    <select>
-        <option>All Categories</option>
-        {% for category in EXPENSE_CATEGORIES %}
-        <option value="{{ category }}">{{ category }}</option>
-        {% endfor %}
-    </select>
-
-    {% if expenses %}
-        {% for expense in expenses %}
-            <div>
-                {{ expense.date.strftime('%Y-%m-%d') }}
-                {{ expense.category }}
-                {{ expense.notes }}
-                ${{ "%.2f"|format(expense.amount) }}
-            </div>
-        {% endfor %}
-    {% else %}
-        <div>No expenses found</div>
-    {% endif %}
-
-    <div id="editModal">
-        <h2>Edit Expense</h2>
-        <form method="POST">
-            <div>
-                <label>Date</label>
-                <input type="date">
-            </div>
-            <div>
-                <label>Category</label>
-                <select>
-                    {% for category in EXPENSE_CATEGORIES %}
-                    <option value="{{ category }}">{{ category }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div>
-                <label>Amount ($)</label>
-                <input type="text">
-            </div>
-            <div>
-                <label>Notes</label>
-                <textarea></textarea>
-            </div>
-            <button type="submit">Save Changes</button>
-            <button type="button">Cancel</button>
-        </form>
+    <!-- Search by category -->
+    <div class="search-section">
+        <select id="categoryFilter" onchange="filterByCategory(this.value)">
+            <option value="">All Categories</option>
+            {% for category in EXPENSE_CATEGORIES %}
+            <option value="{{ category }}" {% if selected_category == category %}selected{% endif %}>
+                {{ category }}
+            </option>
+            {% endfor %}
+        </select>
     </div>
+
+    <!-- Display expenses in chronological order -->
+    <div class="expenses-list">
+        {% if expenses %}
+            {% for expense in expenses %}
+            <div class="expense-item" onclick="window.location.href='/edit_expense/{{ expense._id }}'">
+                <span class="expense-date">{{ expense.date.strftime('%Y-%m-%d') }}</span>
+                <span class="expense-category">{{ expense.category }}</span>
+                <span class="expense-notes">{{ expense.notes }}</span>
+                <span class="expense-amount">${{ "%.2f"|format(expense.amount) }}</span>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="no-expenses">No expenses found</div>
+        {% endif %}
+    </div>
+
+    <script>
+        function filterByCategory(category) {
+            window.location.href = '/view_expenses' + (category ? '?category=' + category : '');
+        }
+    </script>
 </body>
 </html>

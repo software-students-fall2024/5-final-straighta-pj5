@@ -281,13 +281,49 @@ def view_expenses():
     # Get expenses
     expenses = list(expenses_collection.find(query).sort('date', -1))
     
-    # Get current budget
-    current_budget = budgets_collection.find_one({'username': session['username']})
     
     return render_template('view_expenses.html', 
                          expenses=expenses,
-                         current_budget=current_budget,
-                         categories=EXPENSE_CATEGORIES)
+                         EXPENSE_CATEGORIES=EXPENSE_CATEGORIES,
+                         selected_category=category)
+
+@app.route('/edit_expense/<expense_id>', methods=['GET', 'POST'])
+def edit_expense(expense_id):
+    if 'username' not in session:
+        return redirect(url_for('auth'))
+    
+    try:
+        expense = expenses_collection.find_one({
+            '_id': ObjectId(expense_id),
+            'username': session['username']
+        })
+        
+        if not expense:
+            return redirect(url_for('view_expenses'))
+        
+        if request.method == 'POST':
+            try:
+                updates = {
+                    'date': datetime.strptime(request.form['date'], '%Y-%m-%d'),
+                    'category': request.form['category'],
+                    'amount': float(request.form['amount']),
+                    'notes': request.form['notes'],
+                    'updated_at': datetime.utcnow()
+                }
+                
+                expenses_collection.update_one(
+                    {'_id': ObjectId(expense_id)},
+                    {'$set': updates}
+                )
+                return redirect(url_for('view_expenses'))
+            except Exception as e:
+                return str(e), 400
+        
+        return render_template('edit_expense.html',
+                             expense=expense,
+                             EXPENSE_CATEGORIES=EXPENSE_CATEGORIES)
+    except Exception as e:
+        return str(e), 400
 
 # Helper function to calculate monthly total
 def get_monthly_total(username, year, month):
