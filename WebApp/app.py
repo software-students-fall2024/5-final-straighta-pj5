@@ -365,11 +365,11 @@ def display():
 
     if date_range == 'week':
         start_date = today - timedelta(days=today.weekday())
-        end_date = start_date + timedelta(weeks=1)
+        end_date = start_date + timedelta(days=7)
     elif date_range == 'month':
         start_date = today.replace(day=1)
         next_month = (today.month % 12) + 1
-        end_date = today.replace(month=next_month, day=1)
+        end_date = today.replace(month=next_month, day=1) if next_month != 1 else today.replace(year=today.year + 1, month=1, day=1)
     elif date_range == 'year':
         start_date = today.replace(month=1, day=1)
         end_date = today.replace(year=today.year + 1, month=1, day=1)
@@ -423,14 +423,22 @@ def display():
     # Calculate total spent
     total_spent = sum(detail['amount_spent'] for detail in expense_details)
 
+    # Prepare data for pie chart
+    category_labels = [detail["category"] for detail in expense_details]
+    category_amounts = [detail["amount_spent"] for detail in expense_details]
+
+
     return render_template(
         'display.html',
         date_range=date_range,
         expense_data=expense_data,
         expense_details=expense_details,
         budget=budget_amount,
-        total_spent=total_spent
+        total_spent=total_spent,
+        category_labels=category_labels,
+        category_amounts=category_amounts
     )
+
 
 if __name__ == '__main__':
     app.run(debug=True, host='127.0.0.1', port=3000)
