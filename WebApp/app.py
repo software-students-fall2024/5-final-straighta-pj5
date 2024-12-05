@@ -87,6 +87,7 @@ def profile():
         username=user['username'],
         email=user['email'],
         birthday=user.get('birthday', 'Not Set')
+        current_page='user'
     )
 
 DEFAULT_PROFILE_PIC = os.path.join(os.path.dirname(__file__), 'img', 'default.png')
@@ -233,7 +234,7 @@ def add_expense():
         except Exception as e:
             return str(e), 500
 
-    return render_template('add.html')
+    return render_template('add.html', current_page='add')
 
 # Budget
 @app.route('/set_budget', methods=['GET', 'POST'])
@@ -262,7 +263,7 @@ def set_budget():
             return "Invalid amount", 400
 
     current_budget = budgets_collection.find_one({'username': session['username']})
-    return render_template('set_budget.html', current_budget=current_budget)
+    return render_template('set_budget.html', current_budget=current_budget，current_page='add')
 
 # Expense
 @app.route('/view_expenses')

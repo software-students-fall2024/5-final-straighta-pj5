@@ -7,11 +7,13 @@
         <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     </head>
 <body>
-    <nav>
-        <a href="/profile">Check user profile</a>
-        <a href="/set_budget">Set monthly budget</a>
-        <a href="/add">Create new spent</a>
-    </nav>
+    <nav class="navbar">
+        <a href="/view_expenses.html">Edit Expenses</a>
+        <a href="/display.html">Display Expenses</a>
+        <a href="/profile.html">User Profile</a>
+        <a href="/add.html" class="active">Add Expense</a>
+      </nav>
+      
 
     <h1>Expense History</h1>
 
