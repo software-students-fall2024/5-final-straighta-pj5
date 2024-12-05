@@ -4,22 +4,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Spent Dashboard</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <h1>Spent Dashboard</h1>
 
     <label for="date-range">Choose Date Range:</label>
-    <select id="date-range" onchange="updateChart()">
-        <option value="week">Week</option>
-        <option value="month">Month</option>
-        <option value="year">Year</option>
-    </select>
+    <form method="GET" action="/display">
+        <select name="date_range" id="date-range" onchange="this.form.submit()">
+            <option value="week" {% if date_range == 'week' %}selected{% endif %}>Week</option>
+            <option value="month" {% if date_range == 'month' %}selected{% endif %}>Month</option>
+            <option value="year" {% if date_range == 'year' %}selected{% endif %}>Year</option>
+        </select>
+    </form>
 
-    <canvas id="spentChart"></canvas>
+    <h2>Expense Chart</h2>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Day</th>
+                <th>Spent Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for day, amount in expense_data.items() %}
+            <tr>
+                <td>{{ day }}</td>
+                <td>${{ "%.2f"|format(amount) }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 
     <h2>Expense Details</h2>
-    <table id="expense-table" border="1">
+    <table border="1">
         <thead>
             <tr>
                 <th>Category</th>
@@ -27,81 +44,21 @@
                 <th>Total Amount Spent</th>
             </tr>
         </thead>
-        <tbody id="expense-table-body">
-            <!-- Table rows will be populated dynamically -->
+        <tbody>
+            {% for detail in expense_details %}
+            <tr>
+                <td>{{ detail.category }}</td>
+                <td>{{ detail.num_transactions }}</td>
+                <td>${{ "%.2f"|format(detail.amount_spent) }}</td>
+            </tr>
+            {% endfor %}
         </tbody>
     </table>
 
-    <div id="budget-warning" style="color: red;"></div>
-
-    <script>
-        async function fetchExpenseData(dateRange) {
-            const response = await fetch(`/api/expense_data/${dateRange}`);
-            const data = await response.json();
-            return data;
-        }
-
-        async function fetchExpenseDetails(dateRange) {
-            const response = await fetch(`/api/expense_details/${dateRange}`);
-            const details = await response.json();
-            return details;
-        }
-
-        const ctx = document.getElementById('spentChart').getContext('2d');
-        let spentChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: [],
-                datasets: [{
-                    label: 'Spent Amount',
-                    data: [],
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
-
-        async function updateChart() {
-            const dateRange = document.getElementById('date-range').value;
-            const expenseData = await fetchExpenseData(dateRange);
-
-            spentChart.data.labels = Array.from({ length: expenseData.length }, (_, i) => `Day ${i + 1}`);
-            spentChart.data.datasets[0].data = expenseData;
-            spentChart.update();
-
-            updateTable();
-        }
-
-        async function updateTable() {
-            const dateRange = document.getElementById('date-range').value;
-            const expenseDetails = await fetchExpenseDetails(dateRange);
-            const expenseTableBody = document.getElementById('expense-table-body');
-            expenseTableBody.innerHTML = '';
-
-            let totalSpent = 0;
-            expenseDetails.forEach(detail => {
-                totalSpent += detail.amount_spent;
-                let row = `<tr>
-                    <td>${detail.category}</td>
-                    <td>${detail.num_transactions}</td>
-                    <td>${detail.amount_spent}</td>
-                </tr>`;
-                expenseTableBody.innerHTML += row;
-            });
-
-            document.getElementById('budget-warning').textContent = totalSpent > budget ? 'Warning: You have exceeded your budget!' : '';
-        }
-
-        // Initial chart and table update
-        updateChart();
-    </script>
+    <div id="budget-warning" style="color: red;">
+        {% if total_spent > budget %}
+        Warning: You have exceeded your budget!
+        {% endif %}
+    </div>
 </body>
 </html>
