@@ -3,8 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <title>Login + Signup</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
+    <nav class="navbar">
+        <a href="/view_expenses.html">Edit Expenses</a>
+        <a href="/display.html">Display Expenses</a>
+        <a href="/profile.html">User Profile</a>
+        <a href="/add.html" class="active">Add Expense</a>
+      </nav>
+      
     <div class="container">
         <h2>Login</h2>
         <form action="/login" method="POST">

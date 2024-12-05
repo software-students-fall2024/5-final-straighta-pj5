@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Add Expense</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <style>
       .calculator {
         display: flex;
@@ -25,6 +26,15 @@
     </style>
   </head>
   <body>
+    <!-- Navbar -->
+    <nav class="navbar">
+      <a href="/view_expenses.html">Edit Expenses</a>
+      <a href="/display.html">Display Expenses</a>
+      <a href="/profile.html">User Profile</a>
+      <a href="/add.html" class="active">Add Expense</a>
+    </nav>
+
+    <!-- Main Content -->da
     <div class="container">
       <h1>Add Expense</h1>
       <form action="/add-expense" method="POST">

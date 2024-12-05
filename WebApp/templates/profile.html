@@ -4,13 +4,21 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>User Profile</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
   </head>
   <body>
+    <nav class="navbar">
+      <a href="/view_expenses.html">Edit Expenses</a>
+      <a href="/display.html">Display Expenses</a>
+      <a href="/profile.html">User Profile</a>
+      <a href="/add.html" class="active">Add Expense</a>
+    </nav>
+    
     <div class="container">
       <h1>User Profile</h1>
 
       <!-- Display Profile Picture -->
-      <img src="/WebApp/img/default.png" alt="Profile Picture" class="profile-pic" id="profile-pic" />
+      <img src="/get-pic" alt="Profile Picture" class="profile-pic" id="profile-pic" />
 
       <!-- Upload New Profile Picture -->
       <form action="/upload-pic" method="POST" enctype="multipart/form-data" class="form-group">

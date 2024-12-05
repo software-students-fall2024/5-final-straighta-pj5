@@ -1,11 +1,16 @@
-from flask import Flask, request, jsonify, render_template, redirect, url_for, session
+from flask import Flask, request, jsonify, render_template, redirect, url_for, session, send_file, Response
 import os
 import bcrypt
 from pymongo import MongoClient
 from datetime import datetime
 from bson import ObjectId
+import base64
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
+
+app.secret_key = "5c354f218df7fc8404628facdcf6b76e923be3546f082185bf76aef1dade3d45"
+app.secret_key = os.getenv("SECRET_KEY", "your_default_secret_key")
 
 mongo_uri = os.getenv('MONGO_URI', 'mongodb://localhost:27017/')
 client = MongoClient(mongo_uri)
@@ -22,7 +27,7 @@ EXPENSE_CATEGORIES = ['Food', 'Transportation', 'Entertainment', 'Housing', 'Gro
 @app.route('/')
 def home():
     if 'username' in session:
-        return render_template('home.html', username=session['username'])
+        return redirect(url_for('add_expense'))
     return redirect(url_for('auth'))
 
 @app.route('/auth')
@@ -40,7 +45,7 @@ def login():
     user = users_collection.find_one({'username': username})
     if user and bcrypt.checkpw(password.encode('utf-8'), user['password']):
         session['username'] = username 
-        return jsonify(message="Login successful!"), 200
+        return redirect("/")
     else:
         return jsonify(message="Invalid username or password."), 401
 
@@ -61,8 +66,175 @@ def signup():
         'email': email,
         'password': hashed_password
     })
+    session['username'] = username
+    return redirect("/")
 
-    return jsonify(message="Signup successful!"), 201
+# Profile
+@app.route('/profile', methods=['GET'])
+def profile():
+    if 'username' not in session:
+        return redirect(url_for('auth'))
+
+    # Fetch user information from the database
+    user = users_collection.find_one({'username': session['username']})
+    if not user:
+        return "User not found", 404
+
+    # Pass user data to the profile.html template
+    return render_template(
+        'profile.html',
+        profile_picture=user.get('profile_picture', '/WebApp/img/default.png'),
+        username=user['username'],
+        email=user['email'],
+        birthday=user.get('birthday', 'Not Set')
+        current_page='user'
+    )
+
+DEFAULT_PROFILE_PIC = os.path.join(os.path.dirname(__file__), 'img', 'default.png')
+
+@app.route('/get-pic', methods=['GET'])
+def get_profile_pic():
+    if 'username' not in session:
+        return redirect(url_for('auth'))
+    user = users_collection.find_one({'username': session['username']})
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+
+    profile_pic = user.get('profile_picture')
+    if profile_pic:
+        try:
+            image_data = base64.b64decode(profile_pic)
+            mime_type = user.get('profile_picture_mime_type', 'image/jpeg')
+            # Return the image data with appropriate headers
+            return Response(image_data, mimetype=mime_type)
+        except Exception as e:
+            print(f"Error decoding image data: {e}")
+            return send_file(DEFAULT_PROFILE_PIC, mimetype='image/png')
+    else:
+        return send_file(DEFAULT_PROFILE_PIC, mimetype='image/png')
+
+@app.route('/upload-pic', methods=['POST'])
+def upload_profile_pic():
+    if 'username' not in session:
+        return redirect(url_for('auth'))
+
+    file = request.files.get('profilePic')
+    if file:
+        file_data = file.read()
+        encoded_data = base64.b64encode(file_data).decode('utf-8')
+        mime_type = file.mimetype
+
+        users_collection.update_one(
+            {'username': session['username']},
+            {'$set': {
+                'profile_picture': encoded_data,
+                'profile_picture_mime_type': mime_type
+            }}
+        )
+        return redirect('/profile')
+    return redirect('/profile')
+
+
+# Update Username and Birthday
+@app.route('/update-username', methods=['POST'])
+def update_username():
+    if 'username' not in session:
+        return redirect(url_for('auth'))
+
+    new_username = request.form.get('newUsername')
+    if new_username:
+        existing_user = users_collection.find_one({'username': new_username})
+        if existing_user:
+            return jsonify({'message': 'Username already exists.'}), 400
+        users_collection.update_one(
+            {'username': session['username']},
+            {'$set': {'username': new_username}}
+        )
+        session['username'] = new_username
+        return redirect('/profile')
+    return redirect('/profile')
+
+
+@app.route('/update-birthday', methods=['POST'])
+def update_birthday():
+    if 'username' not in session:
+        return redirect(url_for('auth'))
+
+    new_birthday = request.form.get('newBirthday')
+    if new_birthday:
+        # Update the birthday in the database
+        users_collection.update_one(
+            {'username': session['username']},
+            {'$set': {'birthday': new_birthday}}
+        )
+        return redirect('/profile')
+    return redirect('/profile')
+
+# Delete Account
+@app.route('/delete-account', methods=['GET','POST'])
+def delete_account():
+    if 'username' not in session:
+        return redirect(url_for('auth'))
+    users_collection.delete_one({'username': session['username']})
+    session.pop('username', None)
+    return redirect(url_for('auth'))
+
+# Sign Out
+@app.route('/logout', methods=['GET','POST'])
+def logout():
+    # Clear the session
+    session.pop('username', None)
+    return redirect(url_for('auth'))
+
+
+### Add Expense Route
+@app.route('/add-expense', methods=['GET','POST'])
+def add_expense():
+    if 'username' not in session:
+        return redirect(url_for('auth'))
+
+    if request.method == 'POST':
+        try:
+            # Validate and parse input data
+            date_str = request.form.get('date')
+            category = request.form.get('category')
+            amount_str = request.form.get('amount')
+            notes = request.form.get('note', '')
+
+            if not date_str or not category or not amount_str:
+                return "All fields (except notes) are required.", 400
+
+            if category not in EXPENSE_CATEGORIES:
+                return "Invalid category.", 400
+
+            try:
+                amount = float(amount_str)
+            except ValueError:
+                return "Invalid amount format.", 400
+
+            # Parse the date
+            try:
+                date = datetime.strptime(date_str, '%Y-%m-%d')
+            except ValueError:
+                return "Invalid date format.", 400
+
+            # Insert the expense into the database
+            expense = {
+                'username': session['username'], 
+                'amount': amount,
+                'category': category,
+                'date': date,
+                'notes': notes,
+                'created_at': datetime.utcnow(),
+                'updated_at': datetime.utcnow()
+            }
+            expenses_collection.insert_one(expense)
+
+            return redirect(url_for('view_expenses'))
+        except Exception as e:
+            return str(e), 500
+
+    return render_template('add.html', current_page='add')
 
 # Budget
 @app.route('/set_budget', methods=['GET', 'POST'])
@@ -91,7 +263,7 @@ def set_budget():
             return "Invalid amount", 400
 
     current_budget = budgets_collection.find_one({'username': session['username']})
-    return render_template('set_budget.html', current_budget=current_budget)
+    return render_template('set_budget.html', current_budget=current_budget，current_page='add')
 
 # Expense
 @app.route('/view_expenses')
@@ -225,4 +397,4 @@ def display():
     )
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='127.0.0.1', port=3000)
