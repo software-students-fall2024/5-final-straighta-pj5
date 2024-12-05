@@ -86,7 +86,7 @@ def profile():
         profile_picture=user.get('profile_picture', '/WebApp/img/default.png'),
         username=user['username'],
         email=user['email'],
-        birthday=user.get('birthday', 'Not Set')
+        birthday=user.get('birthday', 'Not Set'),
         current_page='user'
     )
 
@@ -263,7 +263,7 @@ def set_budget():
             return "Invalid amount", 400
 
     current_budget = budgets_collection.find_one({'username': session['username']})
-    return render_template('set_budget.html', current_budget=current_budget，current_page='add')
+    return render_template('set_budget.html', current_budget=current_budge, current_page='add')
 
 # Expense
 @app.route('/view_expenses')
