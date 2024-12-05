@@ -3,3 +3,4 @@ pymongo==4.0.1
 bcrypt==3.2.0
 #bson
 Werkzeug==2.0.2
+pytest
