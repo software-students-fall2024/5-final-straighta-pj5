@@ -4,6 +4,22 @@
     <meta charset="UTF-8">
     <title>Login + Signup</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        .flashes {
+        margin: 15px 0;
+        padding: 10px;
+        }
+
+        .flash-error {
+            color: red;
+            font-weight: bold;
+            border: 1px solid red;
+            border-radius: 5px;
+            background-color: #ffe6e6;
+            padding: 8px 10px;
+            margin-bottom: 10px;
+        }
+    </style>
 </head>
 <body>
     <nav class="navbar">
@@ -15,7 +31,17 @@
     
       
     <div class="container">
-        <h2>Login</h2>
+         <!-- Display Error Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            <div class="flashes">
+                {% for category, message in messages %}
+                    <p class="flash-{{ category }}">{{ message }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+        {% endwith %}
+            <h2>Login</h2>
         <form action="/login" method="POST">
             <label for="loginUsername">Username:</label>
             <input type="text" id="loginUsername" name="username" required>

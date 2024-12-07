@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, render_template, redirect, url_for, session, send_file, Response
+from flask import Flask, request, jsonify, render_template, redirect, url_for, session, send_file, Response, flash, get_flashed_messages
 import os
 import bcrypt
 from pymongo import MongoClient
@@ -47,7 +47,8 @@ def login():
         session['username'] = username 
         return redirect("/")
     else:
-        return jsonify(message="Invalid username or password."), 401
+        flash("Invalid username or password.", "error") 
+        return redirect(url_for('auth'))
 
 # Signup
 @app.route('/signup', methods=['POST'])
@@ -57,7 +58,8 @@ def signup():
     password = request.form.get('password')
 
     if users_collection.find_one({'username': username}):
-        return jsonify(message="Username already exists."), 400
+        flash("Username already exists.", "error")  
+        return redirect(url_for('auth'))
 
     hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 
@@ -120,18 +122,23 @@ def upload_profile_pic():
 
     file = request.files.get('profilePic')
     if file:
-        file_data = file.read()
-        encoded_data = base64.b64encode(file_data).decode('utf-8')
-        mime_type = file.mimetype
+        try:
+            file_data = file.read()
+            encoded_data = base64.b64encode(file_data).decode('utf-8')
+            mime_type = file.mimetype
 
-        users_collection.update_one(
-            {'username': session['username']},
-            {'$set': {
-                'profile_picture': encoded_data,
-                'profile_picture_mime_type': mime_type
-            }}
-        )
-        return redirect('/profile')
+            users_collection.update_one(
+                {'username': session['username']},
+                {'$set': {
+                    'profile_picture': encoded_data,
+                    'profile_picture_mime_type': mime_type
+                }}
+            )
+            flash("Profile picture updated successfully!", "success")
+        except Exception as e:
+            flash(f"Failed to upload picture: {str(e)}", "error")
+    else:
+        flash("No file selected for upload.", "error")
     return redirect('/profile')
 
 
@@ -145,13 +152,16 @@ def update_username():
     if new_username:
         existing_user = users_collection.find_one({'username': new_username})
         if existing_user:
-            return jsonify({'message': 'Username already exists.'}), 400
+            flash("Username already exists.", "error")
+            return redirect('/profile')
         users_collection.update_one(
             {'username': session['username']},
             {'$set': {'username': new_username}}
         )
         session['username'] = new_username
-        return redirect('/profile')
+        flash("Username updated successfully!", "success")
+    else:
+        flash("New username cannot be empty.", "error")
     return redirect('/profile')
 
 
@@ -162,12 +172,16 @@ def update_birthday():
 
     new_birthday = request.form.get('newBirthday')
     if new_birthday:
-        # Update the birthday in the database
-        users_collection.update_one(
-            {'username': session['username']},
-            {'$set': {'birthday': new_birthday}}
-        )
-        return redirect('/profile')
+        try:
+            users_collection.update_one(
+                {'username': session['username']},
+                {'$set': {'birthday': new_birthday}}
+            )
+            flash("Birthday updated successfully!", "success")
+        except Exception as e:
+            flash(f"Failed to update birthday: {str(e)}", "error")
+    else:
+        flash("Please provide a valid birthday.", "error")
     return redirect('/profile')
 
 # Delete Account

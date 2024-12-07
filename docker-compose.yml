@@ -9,7 +9,8 @@ services:
       - "3000:3000"
     environment:
       - SECRET_KEY=your_secret_key
-      - MONGO_URI=mongodb://mongo:27017/
+      - MONGO_URI=mongodb+srv://ql2138:W2L26WaXhb7AufjU@cluster0.la97a.mongodb.net/pj5expense?retryWrites=true&w=majority&appName=Cluster0
+
     depends_on:
       - mongo
 

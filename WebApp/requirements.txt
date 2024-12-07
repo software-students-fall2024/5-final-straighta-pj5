@@ -4,3 +4,4 @@ bcrypt==3.2.0
 #bson
 Werkzeug==2.0.2
 pytest
+dnspython==2.3.0
