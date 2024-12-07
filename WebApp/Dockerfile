@@ -22,7 +22,7 @@ COPY . .
 ENV FLASK_APP=app.py
 ENV FLASK_ENV=development
 ENV SECRET_KEY=your_default_secret_key
-ENV MONGO_URI=mongodb://mongo:27017/
+ENV MONGO_URI=mongodb+srv://ql2138:W2L26WaXhb7AufjU@cluster0.la97a.mongodb.net/pj5expense?retryWrites=true&w=majority&appName=Cluster0
 
 # Expose the port that the Flask app runs on
 EXPOSE 3000
