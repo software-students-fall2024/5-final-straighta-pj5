@@ -18,6 +18,13 @@ The Financial Tracker Web Application is designed to help users manage their fin
 
 ---
 
+## **Subsystems**
+The project consist of two main subsystems, each have its DockerFile:
+1. **Web**:
+- Build with Flask, allow user to complete the above functions
+2. **Mongo**
+- Acts as the database for storing uploaded images and analysis results.
+
 ## Instruction to Run the Project
 
 1. **Pre-requisites**
