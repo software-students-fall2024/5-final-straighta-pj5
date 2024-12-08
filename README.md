@@ -73,6 +73,46 @@ python -m venv venv
     ```
 - Open in web browsers: http://127.0.0.1:3000/
 
+5. **Run MongoDB (if using Docker)**
+   - If you’re running MongoDB locally using Docker, start the MongoDB container:
+   ```bash
+   docker-compose up --build
+   ```
+   - If any container has name conflicts (my-mongo):
+      - stop the old containter by:
+      ```bash
+      docker stop my-mongo
+      ```
+      - After stopping, remove it with:
+      ```bash
+      docker rm my-mongo
+      ```
+      - Then start the MongoDB container.
+
+6. **Access the Application**
+   - Open a web browser and go to `http://127.0.0.1:3000/` 
+   This will take you to the login page.
+
+7. **Deactivate the Virtual Environment (Optional)**
+   - When finished, deactivate the virtual environment by typing:
+     ```bas
+     deactivate
+     ```
+
+8. **Contributing**
+   - Fork the repository.
+   - Create a new branch for your feature:
+   ```bash
+   git checkout -b feature/your-feature
+   ```
+   - Commit and push your changes
+   ```bash
+   git commit -m "Add your feature"
+   git push origin feature/your-feature
+   ```
+   - Open a pull request on GitHub.
+
+
 ## **Team Members**
 - [Elaine Lyu](https://github.com/ElaineR02)
 - [Linda Li](https://github.com/Applejam-ovo)
