@@ -18,20 +18,60 @@ The Financial Tracker Web Application is designed to help users manage their fin
 
 ---
 
+## **Subsystems**
+The project consist of two main subsystems, each have its DockerFile:
+
+### **1. Web**:
+- **Technology**: Python(Flask)
+- **Functionality**: Allow user to complete the above features.
+- **Code Location**: `WebApp/.`
+### **2. Mongo**
+- **Technology**: MongoDB Database
+- **Functionality**: Acts as the database for storing uploaded images and analysis results.
+
 ## Instruction to Run the Project
 
 1. **Pre-requisites**
 - Docker and Docker Compose installed.
 - Access to MongoDB Atlas or a local MongoDB instance.
+- Install python: 
+    -   Make sure Python 3.8 or higher is installed on your system. You can download it from python.org.
 
 2. **Clone the Repository**
 ```bash
 git clone https://github.com/software-students-fall2024/5-final-straighta-pj5
 cd 5-final-straighta-pj5
 ```
+3. **Set up Virtual Environment**
+- Run the following commands to create and activate the virtual environment:
+```bash
+python3 -m venv venv
+```
+or
+```bash
+python -m venv venv
+```
+- Activate the virtual environment:
+    - On Windows:
+    ```bash
+    .\venv\Scripts\activate
+    ```
+    - On Mac:
+    ```bash
+    source venv/bin/activate
+    ```
 
-
-
+4. **Run Locally**
+- Install Dependencies:
+    - Use the requirements.txt file to install the necessary Python libraries:
+    ```bash
+    pip install -r WebApp/requirements.txt
+    ```
+- Run the app:
+    ```bash
+    python WebApp/app.py
+    ```
+- Open in web browsers: http://127.0.0.1:3000/
 
 ## **Team Members**
 - [Elaine Lyu](https://github.com/ElaineR02)
