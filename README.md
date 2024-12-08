@@ -61,7 +61,17 @@ python -m venv venv
     source venv/bin/activate
     ```
 
-
+4. **Run Locally**
+- Install Dependencies:
+    - Use the requirements.txt file to install the necessary Python libraries:
+    ```bash
+    pip install -r WebApp/requirements.txt
+    ```
+- Run the app:
+    ```bash
+    python WebApp/app.py
+    ```
+- Open in web browsers: http://127.0.0.1:3000/
 
 ## **Team Members**
 - [Elaine Lyu](https://github.com/ElaineR02)
