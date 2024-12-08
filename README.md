@@ -34,13 +34,32 @@ The project consist of two main subsystems, each have its DockerFile:
 1. **Pre-requisites**
 - Docker and Docker Compose installed.
 - Access to MongoDB Atlas or a local MongoDB instance.
+- Install python: 
+    -   Make sure Python 3.8 or higher is installed on your system. You can download it from python.org.
 
 2. **Clone the Repository**
 ```bash
 git clone https://github.com/software-students-fall2024/5-final-straighta-pj5
 cd 5-final-straighta-pj5
 ```
-
+3. **Set up Virtual Environment**
+- Run the following commands to create and activate the virtual environment:
+```bash
+python3 -m venv venv
+```
+or
+```bash
+python -m venv venv
+```
+- Activate the virtual environment:
+    - On Windows:
+    ```bash
+    .\venv\Scripts\activate
+    ```
+    - On Mac:
+    ```bash
+    source venv/bin/activate
+    ```
 
 
 
