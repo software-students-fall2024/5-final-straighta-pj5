@@ -71,9 +71,8 @@ python -m venv venv
     ```bash
     python WebApp/app.py
     ```
-- Open in web browsers: http://127.0.0.1:3000/
 
-5. **Run MongoDB (if using Docker)**
+5. **Run Docker**
    - If you’re running MongoDB locally using Docker, start the MongoDB container:
    ```bash
    docker-compose up --build
@@ -99,7 +98,10 @@ python -m venv venv
      deactivate
      ```
 
-8. **Contributing**
+8. **Deployed Website**
+   - http://159.203.104.236:3000
+
+9. **Contributing**
    - Fork the repository.
    - Create a new branch for your feature:
    ```bash
