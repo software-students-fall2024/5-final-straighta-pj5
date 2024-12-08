@@ -71,7 +71,48 @@ python -m venv venv
     ```bash
     python WebApp/app.py
     ```
-- Open in web browsers: http://127.0.0.1:3000/
+
+5. **Run Docker**
+   - You can build and start docker by: 
+   ```bash
+   docker-compose up --build
+   ```
+   - If any container has name conflicts (my-mongo):
+      - stop the old containter by:
+      ```bash
+      docker stop mongo
+      ```
+      - After stopping, remove it with:
+      ```bash
+      docker rm mongo
+      ```
+
+6. **Access the Application**
+   - Open a web browser and go to `http://127.0.0.1:3000/` 
+   This will take you to the login page.
+
+7. **Deactivate the Virtual Environment (Optional)**
+   - When finished, deactivate the virtual environment by typing:
+     ```bas
+     deactivate
+     ```
+
+8. **Deployed Website**
+   - http://159.203.104.236:3000
+
+9. **Contributing**
+   - Fork the repository.
+   - Create a new branch for your feature:
+   ```bash
+   git checkout -b feature/your-feature
+   ```
+   - Commit and push your changes
+   ```bash
+   git commit -m "Add your feature"
+   git push origin feature/your-feature
+   ```
+   - Open a pull request on GitHub.
+
 
 ## **Team Members**
 - [Elaine Lyu](https://github.com/ElaineR02)
