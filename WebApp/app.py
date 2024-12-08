@@ -330,8 +330,9 @@ def edit_expense(expense_id):
                     {'$set': updates}
                 )
                 return redirect(url_for('view_expenses'))
-            except Exception as e:
-                return str(e), 400
+            except ValueError as e:
+                # Return a user-friendly error message
+                return "Invalid date format. Please use YYYY-MM-DD.", 400
         
         return render_template('edit_expense.html',
                              expense=expense,
