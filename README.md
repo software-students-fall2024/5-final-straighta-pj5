@@ -73,20 +73,19 @@ python -m venv venv
     ```
 
 5. **Run Docker**
-   - If you’re running MongoDB locally using Docker, start the MongoDB container:
+   - You can build and start docker by: 
    ```bash
    docker-compose up --build
    ```
    - If any container has name conflicts (my-mongo):
       - stop the old containter by:
       ```bash
-      docker stop my-mongo
+      docker stop mongo
       ```
       - After stopping, remove it with:
       ```bash
-      docker rm my-mongo
+      docker rm mongo
       ```
-      - Then start the MongoDB container.
 
 6. **Access the Application**
    - Open a web browser and go to `http://127.0.0.1:3000/` 
